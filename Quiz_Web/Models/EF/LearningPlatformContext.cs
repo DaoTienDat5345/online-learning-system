@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Quiz_Web.Models.Entities;
@@ -129,7 +129,7 @@ public partial class LearningPlatformContext : DbContext
             entity.HasKey(e => e.AuditId).HasName("PK__AuditLog__A17F2398427591F1");
 
             entity.Property(e => e.Action).HasMaxLength(100);
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
             entity.Property(e => e.EntityType).HasMaxLength(50);
             entity.Property(e => e.IpAddress)
                 .HasMaxLength(45)
@@ -146,7 +146,7 @@ public partial class LearningPlatformContext : DbContext
 
             entity.HasIndex(e => new { e.CartId, e.CourseId }, "UQ_CartItems_Cart_Course").IsUnique();
 
-            entity.Property(e => e.AddedAt).HasDefaultValueSql("(sysutcdatetime())");
+            entity.Property(e => e.AddedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             entity.HasOne(d => d.Cart).WithMany(p => p.CartItems)
                 .HasForeignKey(d => d.CartId)
@@ -165,7 +165,7 @@ public partial class LearningPlatformContext : DbContext
 
             entity.HasIndex(e => e.VerifyCode, "UQ_Certificates_Verify").IsUnique();
 
-            entity.Property(e => e.IssuedAt).HasDefaultValueSql("(sysutcdatetime())");
+            entity.Property(e => e.IssuedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
             entity.Property(e => e.Serial).HasMaxLength(50);
             entity.Property(e => e.VerifyCode).HasMaxLength(50);
 
@@ -187,7 +187,7 @@ public partial class LearningPlatformContext : DbContext
             entity.Property(e => e.ContentType)
                 .HasMaxLength(20)
                 .IsUnicode(false);
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
             entity.Property(e => e.TargetType)
                 .HasMaxLength(10)
                 .IsUnicode(false);
@@ -220,7 +220,7 @@ public partial class LearningPlatformContext : DbContext
 
             entity.Property(e => e.AverageRating).HasColumnType("decimal(3, 2)");
             entity.Property(e => e.CoverUrl).HasMaxLength(500);
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
             entity.Property(e => e.Price).HasColumnType("decimal(12, 2)");
             entity.Property(e => e.Slug).HasMaxLength(200);
             entity.Property(e => e.Title).HasMaxLength(200);
@@ -241,7 +241,7 @@ public partial class LearningPlatformContext : DbContext
 
             entity.HasIndex(e => e.Slug, "UQ__CourseCa__BC7B5FB6F93D6A58").IsUnique();
 
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
             entity.Property(e => e.IconUrl).HasMaxLength(500);
             entity.Property(e => e.Name).HasMaxLength(200);
             entity.Property(e => e.Slug).HasMaxLength(200);
@@ -267,7 +267,7 @@ public partial class LearningPlatformContext : DbContext
             entity.Property(e => e.ContentType)
                 .HasMaxLength(20)
                 .IsUnicode(false);
-            entity.Property(e => e.LastViewedAt).HasDefaultValueSql("(sysutcdatetime())");
+            entity.Property(e => e.LastViewedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
             entity.Property(e => e.Score).HasColumnType("decimal(6, 2)");
 
             entity.HasOne(d => d.Course).WithMany(p => p.CourseProgresses)
@@ -286,7 +286,7 @@ public partial class LearningPlatformContext : DbContext
 
             entity.Property(e => e.Currency).HasMaxLength(10);
             entity.Property(e => e.PricePaid).HasColumnType("decimal(12, 2)");
-            entity.Property(e => e.PurchasedAt).HasDefaultValueSql("(sysutcdatetime())");
+            entity.Property(e => e.PurchasedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
             entity.Property(e => e.Status)
                 .HasMaxLength(20)
                 .IsUnicode(false);
@@ -310,7 +310,7 @@ public partial class LearningPlatformContext : DbContext
             entity.HasIndex(e => e.CourseId, "IX_CourseReviews_Course");
 
             entity.Property(e => e.Comment).HasMaxLength(1000);
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
             entity.Property(e => e.IsApproved).HasDefaultValue(true);
             entity.Property(e => e.Rating).HasColumnType("decimal(2, 1)");
 
@@ -328,7 +328,7 @@ public partial class LearningPlatformContext : DbContext
         {
             entity.HasKey(e => e.ErrorId).HasName("PK__ErrorLog__35856A2A985924C4");
 
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
             entity.Property(e => e.Message).HasMaxLength(4000);
             entity.Property(e => e.Severity)
                 .HasMaxLength(10)
@@ -339,7 +339,7 @@ public partial class LearningPlatformContext : DbContext
         {
             entity.HasKey(e => e.FileId).HasName("PK__Files__6F0F98BFEE73AFB7");
 
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
             entity.Property(e => e.FileName).HasMaxLength(255);
             entity.Property(e => e.MimeType).HasMaxLength(100);
             entity.Property(e => e.StoragePath).HasMaxLength(500);
@@ -354,7 +354,7 @@ public partial class LearningPlatformContext : DbContext
         {
             entity.HasKey(e => e.CardId).HasName("PK__Flashcar__55FECDAE22B679D4");
 
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
             entity.Property(e => e.Hint).HasMaxLength(500);
 
             entity.HasOne(d => d.BackMedia).WithMany(p => p.FlashcardBackMedia)
@@ -398,7 +398,7 @@ public partial class LearningPlatformContext : DbContext
             entity.HasKey(e => e.SetId).HasName("PK__Flashcar__7E08471D6D606900");
 
             entity.Property(e => e.CoverUrl).HasMaxLength(500);
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
             entity.Property(e => e.Language).HasMaxLength(20);
             entity.Property(e => e.TagsText).HasMaxLength(500);
             entity.Property(e => e.Title).HasMaxLength(200);
@@ -416,7 +416,7 @@ public partial class LearningPlatformContext : DbContext
         {
             entity.HasKey(e => e.FolderId).HasName("PK__Folders__ACD7107F7D93F1ED");
 
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
             entity.Property(e => e.Name).HasMaxLength(200);
 
             entity.HasOne(d => d.Library).WithMany(p => p.Folders)
@@ -433,7 +433,7 @@ public partial class LearningPlatformContext : DbContext
         {
             entity.HasKey(e => e.LessonId).HasName("PK__Lessons__B084ACD022F804BF");
 
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
             entity.Property(e => e.Title).HasMaxLength(200);
             entity.Property(e => e.Visibility)
                 .HasMaxLength(20)
@@ -454,7 +454,7 @@ public partial class LearningPlatformContext : DbContext
             entity.Property(e => e.ContentType)
                 .HasMaxLength(20)
                 .IsUnicode(false);
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
             entity.Property(e => e.Title).HasMaxLength(200);
             entity.Property(e => e.VideoUrl).HasMaxLength(500);
 
@@ -467,7 +467,7 @@ public partial class LearningPlatformContext : DbContext
         {
             entity.HasKey(e => e.LibraryId).HasName("PK__Librarie__A136475F60AB60B8");
 
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
             entity.Property(e => e.Name).HasMaxLength(200);
 
             entity.HasOne(d => d.Owner).WithMany(p => p.Libraries)
@@ -480,7 +480,7 @@ public partial class LearningPlatformContext : DbContext
         {
             entity.HasKey(e => e.NotificationId).HasName("PK__Notifica__20CF2E1246E72CAE");
 
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
             entity.Property(e => e.Title).HasMaxLength(200);
             entity.Property(e => e.Type)
                 .HasMaxLength(40)
@@ -496,7 +496,7 @@ public partial class LearningPlatformContext : DbContext
         {
             entity.HasKey(e => e.OrderId).HasName("PK__Orders__C3905BCF2D965192");
 
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
             entity.Property(e => e.Currency)
                 .HasMaxLength(10)
                 .HasDefaultValue("VND");
@@ -638,7 +638,7 @@ public partial class LearningPlatformContext : DbContext
         {
             entity.HasKey(e => e.SavedItemId).HasName("PK__SavedIte__1CBC88C8EC7DF7EA");
 
-            entity.Property(e => e.AddedAt).HasDefaultValueSql("(sysutcdatetime())");
+            entity.Property(e => e.AddedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
             entity.Property(e => e.ContentType)
                 .HasMaxLength(20)
                 .IsUnicode(false);
@@ -660,7 +660,7 @@ public partial class LearningPlatformContext : DbContext
 
             entity.HasIndex(e => e.UserId, "UQ_ShoppingCarts_UserId").IsUnique();
 
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             entity.HasOne(d => d.User).WithOne(p => p.ShoppingCart)
                 .HasForeignKey<ShoppingCart>(d => d.UserId)
@@ -684,7 +684,7 @@ public partial class LearningPlatformContext : DbContext
         {
             entity.HasKey(e => e.TestId).HasName("PK__Tests__8CC331602E3C05C8");
 
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
             entity.Property(e => e.GradingMode)
                 .HasMaxLength(10)
                 .IsUnicode(false);
@@ -706,7 +706,7 @@ public partial class LearningPlatformContext : DbContext
 
             entity.Property(e => e.MaxScore).HasColumnType("decimal(6, 2)");
             entity.Property(e => e.Score).HasColumnType("decimal(6, 2)");
-            entity.Property(e => e.StartedAt).HasDefaultValueSql("(sysutcdatetime())");
+            entity.Property(e => e.StartedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
             entity.Property(e => e.Status)
                 .HasMaxLength(12)
                 .IsUnicode(false);
@@ -729,7 +729,7 @@ public partial class LearningPlatformContext : DbContext
             entity.HasIndex(e => e.Email, "UQ__Users__A9D1053455164E7D").IsUnique();
 
             entity.Property(e => e.AvatarUrl).HasMaxLength(500);
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
             entity.Property(e => e.Email).HasMaxLength(255);
             entity.Property(e => e.FullName).HasMaxLength(200);
             entity.Property(e => e.PasswordHash).HasMaxLength(255);
@@ -754,7 +754,7 @@ public partial class LearningPlatformContext : DbContext
 
             entity.HasIndex(e => new { e.UserId, e.CategoryId }, "UQ_UserInterests_User_Category").IsUnique();
 
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             entity.HasOne(d => d.Category).WithMany(p => p.UserInterests)
                 .HasForeignKey(d => d.CategoryId)
@@ -809,3 +809,4 @@ public partial class LearningPlatformContext : DbContext
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }
+

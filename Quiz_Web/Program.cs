@@ -38,7 +38,7 @@ builder.Services.Configure<CookiePolicyOptions>(options =>
 });
 
 builder.Services.AddDbContext<LearningPlatformContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")),
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")),
     ServiceLifetime.Scoped);
 
 // Configure MoMo settings
@@ -117,3 +117,4 @@ app.MapControllerRoute(
     .WithStaticAssets();
 
 app.Run();
+

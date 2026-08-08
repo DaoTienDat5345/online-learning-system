@@ -2,9 +2,9 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Quiz_Web.Models.EF;
 
 #nullable disable
@@ -12,8 +12,8 @@ using Quiz_Web.Models.EF;
 namespace Quiz_Web.Migrations
 {
     [DbContext(typeof(LearningPlatformContext))]
-    [Migration("20251028011028_AddPasswordResetColumnsToUser")]
-    partial class AddPasswordResetColumnsToUser
+    [Migration("20260805034150_InitialPostgreSQL")]
+    partial class InitialPostgreSQL
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -21,43 +21,44 @@ namespace Quiz_Web.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "9.0.10")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Quiz_Web.Models.Entities.AttemptAnswer", b =>
                 {
                     b.Property<int>("AttemptAnswerId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AttemptAnswerId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("AttemptAnswerId"));
 
                     b.Property<string>("AnswerPayload")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<int>("AttemptId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<bool>("AutoGraded")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<DateTime?>("GradedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int?>("GraderId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<bool?>("IsCorrect")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<int>("QuestionId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<decimal?>("Score")
                         .HasColumnType("decimal(5, 2)");
 
-                    b.HasKey("AttemptAnswerId");
+                    b.HasKey("AttemptAnswerId")
+                        .HasName("PK__AttemptA__EC6FE54E12C4C90E");
 
                     b.HasIndex("AttemptId");
 
@@ -72,78 +73,110 @@ namespace Quiz_Web.Migrations
                 {
                     b.Property<int>("AuditId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AuditId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("AuditId"));
 
                     b.Property<string>("Action")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("After")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Before")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("(sysutcdatetime())");
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<int?>("EntityId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("EntityType")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("character varying(50)");
 
                     b.Property<string>("IpAddress")
                         .HasMaxLength(45)
                         .IsUnicode(false)
-                        .HasColumnType("varchar(45)");
+                        .HasColumnType("character varying(45)");
 
                     b.Property<int?>("UserId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    b.HasKey("AuditId");
+                    b.HasKey("AuditId")
+                        .HasName("PK__AuditLog__A17F2398427591F1");
 
                     b.HasIndex("UserId");
 
                     b.ToTable("AuditLogs");
                 });
 
+            modelBuilder.Entity("Quiz_Web.Models.Entities.CartItem", b =>
+                {
+                    b.Property<int>("CartItemId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("CartItemId"));
+
+                    b.Property<DateTime>("AddedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<int>("CartId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("CourseId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("CartItemId")
+                        .HasName("PK__CartItem__488B0B0A3432F85C");
+
+                    b.HasIndex("CourseId");
+
+                    b.HasIndex(new[] { "CartId", "CourseId" }, "UQ_CartItems_Cart_Course")
+                        .IsUnique();
+
+                    b.ToTable("CartItems");
+                });
+
             modelBuilder.Entity("Quiz_Web.Models.Entities.Certificate", b =>
                 {
                     b.Property<int>("CertId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CertId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("CertId"));
 
                     b.Property<int>("CourseId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("IssuedAt")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("(sysutcdatetime())");
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<string>("Serial")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("character varying(50)");
 
                     b.Property<int>("UserId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("VerifyCode")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("character varying(50)");
 
-                    b.HasKey("CertId");
+                    b.HasKey("CertId")
+                        .HasName("PK__Certific__E5BD38C54777E926");
 
                     b.HasIndex("CourseId");
 
@@ -155,206 +188,58 @@ namespace Quiz_Web.Migrations
                     b.ToTable("Certificates");
                 });
 
-            modelBuilder.Entity("Quiz_Web.Models.Entities.Class", b =>
-                {
-                    b.Property<int>("ClassId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ClassId"));
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("(sysutcdatetime())");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsArchived")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<int>("TeacherId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Term")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.HasKey("ClassId");
-
-                    b.HasIndex("TeacherId");
-
-                    b.HasIndex(new[] { "Code" }, "UQ_Classes_Code")
-                        .IsUnique();
-
-                    b.ToTable("Classes");
-                });
-
-            modelBuilder.Entity("Quiz_Web.Models.Entities.ClassAnnouncement", b =>
-                {
-                    b.Property<int>("AnnouncementId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AnnouncementId"));
-
-                    b.Property<int>("AuthorId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ClassId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("(sysutcdatetime())");
-
-                    b.Property<DateTime?>("PinUntil")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.HasKey("AnnouncementId");
-
-                    b.HasIndex("AuthorId");
-
-                    b.HasIndex("ClassId");
-
-                    b.ToTable("ClassAnnouncements");
-                });
-
-            modelBuilder.Entity("Quiz_Web.Models.Entities.ClassAssignment", b =>
-                {
-                    b.Property<int>("AssignmentId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AssignmentId"));
-
-                    b.Property<int?>("AttemptsAllowed")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ClassId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ContentId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("DueAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("GradingPolicy")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<DateTime?>("StartAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(20)");
-
-                    b.HasKey("AssignmentId");
-
-                    b.HasIndex("ClassId");
-
-                    b.ToTable("ClassAssignments");
-                });
-
-            modelBuilder.Entity("Quiz_Web.Models.Entities.ClassStudent", b =>
-                {
-                    b.Property<int>("ClassId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("StudentId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("JoinedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("(sysutcdatetime())");
-
-                    b.HasKey("ClassId", "StudentId");
-
-                    b.HasIndex("StudentId");
-
-                    b.ToTable("ClassStudents");
-                });
-
             modelBuilder.Entity("Quiz_Web.Models.Entities.ContentShare", b =>
                 {
                     b.Property<int>("ShareId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ShareId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ShareId"));
 
                     b.Property<bool>("CanAssign")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("CanEdit")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("CanView")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
+                        .HasColumnType("boolean")
                         .HasDefaultValue(true);
 
                     b.Property<int>("ContentId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("ContentType")
                         .IsRequired()
                         .HasMaxLength(20)
                         .IsUnicode(false)
-                        .HasColumnType("varchar(20)");
+                        .HasColumnType("character varying(20)");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("(sysutcdatetime())");
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<int>("CreatedBy")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<DateTime?>("ExpiresAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int?>("TargetId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("TargetType")
                         .IsRequired()
                         .HasMaxLength(10)
                         .IsUnicode(false)
-                        .HasColumnType("varchar(10)");
+                        .HasColumnType("character varying(10)");
 
-                    b.HasKey("ShareId");
+                    b.HasKey("ShareId")
+                        .HasName("PK__ContentS__D32A3FEEB660997F");
+
+                    b.HasIndex("CreatedBy");
 
                     b.ToTable("ContentShares");
                 });
@@ -363,23 +248,24 @@ namespace Quiz_Web.Migrations
                 {
                     b.Property<int>("ContentTagId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ContentTagId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ContentTagId"));
 
                     b.Property<int>("ContentId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("ContentType")
                         .IsRequired()
                         .HasMaxLength(20)
                         .IsUnicode(false)
-                        .HasColumnType("varchar(20)");
+                        .HasColumnType("character varying(20)");
 
                     b.Property<int>("TagId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    b.HasKey("ContentTagId");
+                    b.HasKey("ContentTagId")
+                        .HasName("PK__ContentT__8FE574855212AE62");
 
                     b.HasIndex("TagId");
 
@@ -390,31 +276,30 @@ namespace Quiz_Web.Migrations
                 {
                     b.Property<int>("CourseId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CourseId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("CourseId"));
+
+                    b.Property<decimal>("AverageRating")
+                        .HasColumnType("decimal(3, 2)");
+
+                    b.Property<int?>("CategoryId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("CoverUrl")
                         .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasColumnType("character varying(500)");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("(sysutcdatetime())");
-
-                    b.Property<string>("Currency")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)")
-                        .HasDefaultValue("VND");
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<bool>("IsPublished")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<int>("OwnerId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(12, 2)");
@@ -422,20 +307,26 @@ namespace Quiz_Web.Migrations
                     b.Property<string>("Slug")
                         .IsRequired()
                         .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasColumnType("character varying(200)");
 
                     b.Property<string>("Summary")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<int>("TotalReviews")
+                        .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
-                    b.HasKey("CourseId");
+                    b.HasKey("CourseId")
+                        .HasName("PK__Courses__C92D71A708E633CE");
+
+                    b.HasIndex("CategoryId");
 
                     b.HasIndex("OwnerId");
 
@@ -445,82 +336,166 @@ namespace Quiz_Web.Migrations
                     b.ToTable("Courses");
                 });
 
-            modelBuilder.Entity("Quiz_Web.Models.Entities.CourseContent", b =>
+            modelBuilder.Entity("Quiz_Web.Models.Entities.CourseCategory", b =>
                 {
-                    b.Property<int>("CourseContentId")
+                    b.Property<int>("CategoryId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CourseContentId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("CategoryId"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("IconUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.HasKey("CategoryId")
+                        .HasName("PK__CourseCa__19093A0B182C995A");
+
+                    b.HasIndex(new[] { "Slug" }, "UQ__CourseCa__BC7B5FB6F93D6A58")
+                        .IsUnique();
+
+                    b.ToTable("CourseCategories");
+                });
+
+            modelBuilder.Entity("Quiz_Web.Models.Entities.CourseChapter", b =>
+                {
+                    b.Property<int>("ChapterId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ChapterId"));
+
+                    b.Property<int>("CourseId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<int>("OrderIndex")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.HasKey("ChapterId")
+                        .HasName("PK__CourseCh__0893A36A1A132FA9");
+
+                    b.HasIndex("CourseId");
+
+                    b.ToTable("CourseChapters");
+                });
+
+            modelBuilder.Entity("Quiz_Web.Models.Entities.CourseProgress", b =>
+                {
+                    b.Property<int>("ProgressId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ProgressId"));
+
+                    b.Property<DateTime?>("CompletionAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("ContentId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("ContentType")
                         .IsRequired()
                         .HasMaxLength(20)
                         .IsUnicode(false)
-                        .HasColumnType("varchar(20)");
+                        .HasColumnType("character varying(20)");
 
                     b.Property<int>("CourseId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    b.Property<bool>("IsPreview")
-                        .HasColumnType("bit");
+                    b.Property<int?>("DurationSec")
+                        .HasColumnType("integer");
 
-                    b.Property<int>("OrderIndex")
-                        .HasColumnType("int");
+                    b.Property<bool>("IsCompleted")
+                        .HasColumnType("boolean");
 
-                    b.Property<int?>("SectionId")
-                        .HasColumnType("int");
+                    b.Property<DateTime?>("LastViewedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
-                    b.Property<string>("TitleOverride")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                    b.Property<int?>("LessonId")
+                        .HasColumnType("integer");
 
-                    b.HasKey("CourseContentId");
+                    b.Property<decimal?>("Score")
+                        .HasColumnType("decimal(6, 2)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("ProgressId")
+                        .HasName("PK__CoursePr__BAE29CA5857FEE59");
 
                     b.HasIndex("CourseId");
 
-                    b.HasIndex("SectionId");
+                    b.HasIndex("UserId");
 
-                    b.ToTable("CourseContents");
+                    b.ToTable("CourseProgress", (string)null);
                 });
 
             modelBuilder.Entity("Quiz_Web.Models.Entities.CoursePurchase", b =>
                 {
                     b.Property<int>("PurchaseId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PurchaseId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("PurchaseId"));
 
                     b.Property<int>("BuyerId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("CourseId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Currency")
                         .IsRequired()
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
+                        .HasColumnType("character varying(10)");
 
                     b.Property<decimal>("PricePaid")
                         .HasColumnType("decimal(12, 2)");
 
                     b.Property<DateTime>("PurchasedAt")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("(sysutcdatetime())");
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasMaxLength(20)
                         .IsUnicode(false)
-                        .HasColumnType("varchar(20)");
+                        .HasColumnType("character varying(20)");
 
-                    b.HasKey("PurchaseId");
+                    b.HasKey("PurchaseId")
+                        .HasName("PK__CoursePu__6B0A6BBE3B207A0E");
 
                     b.HasIndex("BuyerId");
 
@@ -529,63 +504,85 @@ namespace Quiz_Web.Migrations
                     b.ToTable("CoursePurchases");
                 });
 
-            modelBuilder.Entity("Quiz_Web.Models.Entities.CourseSection", b =>
+            modelBuilder.Entity("Quiz_Web.Models.Entities.CourseReview", b =>
                 {
-                    b.Property<int>("SectionId")
+                    b.Property<int>("ReviewId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SectionId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ReviewId"));
+
+                    b.Property<string>("Comment")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
 
                     b.Property<int>("CourseId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    b.Property<int>("OrderIndex")
-                        .HasColumnType("int");
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                    b.Property<bool>("IsApproved")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
 
-                    b.HasKey("SectionId");
+                    b.Property<decimal>("Rating")
+                        .HasColumnType("decimal(2, 1)");
 
-                    b.HasIndex("CourseId");
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
-                    b.ToTable("CourseSections");
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("ReviewId")
+                        .HasName("PK__CourseRe__74BC79CE283AC994");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex(new[] { "CourseId" }, "IX_CourseReviews_Course");
+
+                    b.ToTable("CourseReviews", t =>
+                        {
+                            t.HasTrigger("trg_UpdateCourseRating");
+                        });
                 });
 
             modelBuilder.Entity("Quiz_Web.Models.Entities.ErrorLog", b =>
                 {
                     b.Property<int>("ErrorId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ErrorId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ErrorId"));
 
                     b.Property<string>("Context")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("(sysutcdatetime())");
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<string>("Message")
                         .IsRequired()
                         .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)");
+                        .HasColumnType("character varying(4000)");
 
                     b.Property<string>("Severity")
                         .IsRequired()
                         .HasMaxLength(10)
                         .IsUnicode(false)
-                        .HasColumnType("varchar(10)");
+                        .HasColumnType("character varying(10)");
 
                     b.Property<string>("Stack")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
-                    b.HasKey("ErrorId");
+                    b.HasKey("ErrorId")
+                        .HasName("PK__ErrorLog__35856A2A985924C4");
 
                     b.ToTable("ErrorLogs");
                 });
@@ -594,33 +591,33 @@ namespace Quiz_Web.Migrations
                 {
                     b.Property<int>("FileId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FileId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("FileId"));
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("(sysutcdatetime())");
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<int?>("DurationSec")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("FileName")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasColumnType("character varying(255)");
 
                     b.Property<int?>("Height")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("MimeType")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("character varying(100)");
 
                     b.Property<int>("OwnerId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<long>("SizeBytes")
                         .HasColumnType("bigint");
@@ -628,12 +625,13 @@ namespace Quiz_Web.Migrations
                     b.Property<string>("StoragePath")
                         .IsRequired()
                         .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasColumnType("character varying(500)");
 
                     b.Property<int?>("Width")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    b.HasKey("FileId");
+                    b.HasKey("FileId")
+                        .HasName("PK__Files__6F0F98BFEE73AFB7");
 
                     b.HasIndex("OwnerId");
 
@@ -644,43 +642,44 @@ namespace Quiz_Web.Migrations
                 {
                     b.Property<int>("CardId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CardId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("CardId"));
 
                     b.Property<int?>("BackMediaId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("BackText")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("(sysutcdatetime())");
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<int?>("FrontMediaId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("FrontText")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Hint")
                         .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasColumnType("character varying(500)");
 
                     b.Property<int>("OrderIndex")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("SetId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
-                    b.HasKey("CardId");
+                    b.HasKey("CardId")
+                        .HasName("PK__Flashcar__55FECDAE22B679D4");
 
                     b.HasIndex("BackMediaId");
 
@@ -695,35 +694,36 @@ namespace Quiz_Web.Migrations
                 {
                     b.Property<int>("LogId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LogId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("LogId"));
 
                     b.Property<int>("CardId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<decimal?>("EaseFactor")
                         .HasColumnType("decimal(4, 2)");
 
                     b.Property<int?>("NextIntervalDays")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int?>("QualityScore")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<DateTime?>("ReviewedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime?>("ScheduledAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("SetId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("UserId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    b.HasKey("LogId");
+                    b.HasKey("LogId")
+                        .HasName("PK__Flashcar__5E5486486B3F9ECA");
 
                     b.HasIndex("CardId");
 
@@ -738,51 +738,52 @@ namespace Quiz_Web.Migrations
                 {
                     b.Property<int>("SetId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SetId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("SetId"));
 
                     b.Property<string>("CoverUrl")
                         .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasColumnType("character varying(500)");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("(sysutcdatetime())");
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Language")
                         .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasColumnType("character varying(20)");
 
                     b.Property<int>("OwnerId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("TagsText")
                         .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasColumnType("character varying(500)");
 
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasColumnType("character varying(200)");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Visibility")
                         .IsRequired()
                         .HasMaxLength(20)
                         .IsUnicode(false)
-                        .HasColumnType("varchar(20)");
+                        .HasColumnType("character varying(20)");
 
-                    b.HasKey("SetId");
+                    b.HasKey("SetId")
+                        .HasName("PK__Flashcar__7E08471D6D606900");
 
                     b.HasIndex("OwnerId");
 
@@ -793,30 +794,31 @@ namespace Quiz_Web.Migrations
                 {
                     b.Property<int>("FolderId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FolderId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("FolderId"));
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("(sysutcdatetime())");
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<int>("LibraryId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasColumnType("character varying(200)");
 
                     b.Property<int>("OrderIndex")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int?>("ParentFolderId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    b.HasKey("FolderId");
+                    b.HasKey("FolderId")
+                        .HasName("PK__Folders__ACD7107F7D93F1ED");
 
                     b.HasIndex("LibraryId");
 
@@ -825,123 +827,125 @@ namespace Quiz_Web.Migrations
                     b.ToTable("Folders");
                 });
 
-            modelBuilder.Entity("Quiz_Web.Models.Entities.Invitation", b =>
-                {
-                    b.Property<int>("InviteId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("InviteId"));
-
-                    b.Property<DateTime?>("AcceptedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("ClassId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<DateTime>("ExpiresAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("InviterId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("RoleSuggested")
-                        .HasMaxLength(10)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(10)");
-
-                    b.Property<string>("Token")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("InviteId");
-
-                    b.HasIndex("ClassId");
-
-                    b.HasIndex("InviterId");
-
-                    b.HasIndex(new[] { "Token" }, "UQ_Invitations_Token")
-                        .IsUnique();
-
-                    b.ToTable("Invitations");
-                });
-
             modelBuilder.Entity("Quiz_Web.Models.Entities.Lesson", b =>
                 {
                     b.Property<int>("LessonId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LessonId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("LessonId"));
 
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CoverUrl")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("ChapterId")
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
-                    b.Property<int?>("EstimatedTime")
-                        .HasColumnType("int");
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("OwnerId")
-                        .HasColumnType("int");
+                    b.Property<int>("OrderIndex")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Visibility")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .IsUnicode(false)
+                        .HasColumnType("character varying(20)")
+                        .HasDefaultValue("Course");
 
-                    b.HasKey("LessonId");
+                    b.HasKey("LessonId")
+                        .HasName("PK__Lessons__B084ACD022F804BF");
 
-                    b.HasIndex("OwnerId");
+                    b.HasIndex("ChapterId");
 
-                    b.ToTable("Lesson");
+                    b.ToTable("Lessons");
+                });
+
+            modelBuilder.Entity("Quiz_Web.Models.Entities.LessonContent", b =>
+                {
+                    b.Property<int>("ContentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ContentId"));
+
+                    b.Property<string>("Body")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .IsUnicode(false)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<int>("LessonId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("OrderIndex")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("RefId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Title")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("VideoUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.HasKey("ContentId")
+                        .HasName("PK__LessonCo__2907A81E0574D749");
+
+                    b.HasIndex(new[] { "LessonId", "OrderIndex" }, "IX_LessonContents_Lesson_Order");
+
+                    b.ToTable("LessonContents");
                 });
 
             modelBuilder.Entity("Quiz_Web.Models.Entities.Library", b =>
                 {
                     b.Property<int>("LibraryId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("LibraryId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("LibraryId"));
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("(sysutcdatetime())");
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasColumnType("character varying(200)");
 
                     b.Property<int>("OwnerId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    b.HasKey("LibraryId");
+                    b.HasKey("LibraryId")
+                        .HasName("PK__Librarie__A136475F60AB60B8");
 
                     b.HasIndex("OwnerId");
 
@@ -952,93 +956,126 @@ namespace Quiz_Web.Migrations
                 {
                     b.Property<int>("NotificationId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("NotificationId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("NotificationId"));
 
                     b.Property<string>("Body")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("(sysutcdatetime())");
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<string>("Data")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsRead")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<DateTime?>("ReadAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasColumnType("character varying(200)");
 
                     b.Property<string>("Type")
                         .IsRequired()
                         .HasMaxLength(40)
                         .IsUnicode(false)
-                        .HasColumnType("varchar(40)");
+                        .HasColumnType("character varying(40)");
 
                     b.Property<int>("UserId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    b.HasKey("NotificationId");
+                    b.HasKey("NotificationId")
+                        .HasName("PK__Notifica__20CF2E1246E72CAE");
 
                     b.HasIndex("UserId");
 
                     b.ToTable("Notifications");
                 });
 
-            modelBuilder.Entity("Quiz_Web.Models.Entities.NotificationChannel", b =>
+            modelBuilder.Entity("Quiz_Web.Models.Entities.Order", b =>
                 {
-                    b.Property<int>("ChannelId")
+                    b.Property<int>("OrderId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ChannelId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("OrderId"));
 
-                    b.Property<string>("AddressOrToken")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("Channel")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(10)");
+                    b.Property<int>("BuyerId")
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("(sysutcdatetime())");
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
-                    b.Property<bool>("Enabled")
+                    b.Property<string>("Currency")
+                        .IsRequired()
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(true);
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)")
+                        .HasDefaultValue("VND");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
+                    b.Property<DateTime?>("PaidAt")
+                        .HasColumnType("timestamp with time zone");
 
-                    b.HasKey("ChannelId");
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .IsUnicode(false)
+                        .HasColumnType("character varying(20)");
 
-                    b.HasIndex("UserId");
+                    b.Property<decimal>("TotalAmount")
+                        .HasColumnType("decimal(12, 2)");
 
-                    b.ToTable("NotificationChannels");
+                    b.HasKey("OrderId")
+                        .HasName("PK__Orders__C3905BCF2D965192");
+
+                    b.HasIndex("BuyerId");
+
+                    b.ToTable("Orders");
+                });
+
+            modelBuilder.Entity("Quiz_Web.Models.Entities.OrderItem", b =>
+                {
+                    b.Property<int>("ItemId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ItemId"));
+
+                    b.Property<int>("CourseId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(12, 2)");
+
+                    b.HasKey("ItemId")
+                        .HasName("PK__OrderIte__727E838BEDC4FB4C");
+
+                    b.HasIndex("CourseId");
+
+                    b.HasIndex("OrderId");
+
+                    b.ToTable("OrderItems");
                 });
 
             modelBuilder.Entity("Quiz_Web.Models.Entities.Payment", b =>
                 {
                     b.Property<int>("PaymentId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PaymentId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("PaymentId"));
 
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(12, 2)");
@@ -1046,36 +1083,37 @@ namespace Quiz_Web.Migrations
                     b.Property<string>("Currency")
                         .IsRequired()
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("integer");
 
                     b.Property<DateTime?>("PaidAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Provider")
                         .IsRequired()
                         .HasMaxLength(40)
                         .IsUnicode(false)
-                        .HasColumnType("varchar(40)");
+                        .HasColumnType("character varying(40)");
 
                     b.Property<string>("ProviderRef")
-                        .HasMaxLength(120)
-                        .HasColumnType("nvarchar(120)");
-
-                    b.Property<int>("PurchaseId")
-                        .HasColumnType("int");
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
 
                     b.Property<string>("RawPayload")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasMaxLength(20)
                         .IsUnicode(false)
-                        .HasColumnType("varchar(20)");
+                        .HasColumnType("character varying(20)");
 
-                    b.HasKey("PaymentId");
+                    b.HasKey("PaymentId")
+                        .HasName("PK__Payments__9B556A38D5990A46");
 
-                    b.HasIndex("PurchaseId");
+                    b.HasIndex("OrderId");
 
                     b.ToTable("Payments");
                 });
@@ -1084,15 +1122,15 @@ namespace Quiz_Web.Migrations
                 {
                     b.Property<int>("QuestionId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("QuestionId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("QuestionId"));
 
                     b.Property<string>("Metadata")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<int>("OrderIndex")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<decimal>("Points")
                         .ValueGeneratedOnAdd()
@@ -1100,22 +1138,23 @@ namespace Quiz_Web.Migrations
                         .HasDefaultValue(1m);
 
                     b.Property<int?>("StemMediaId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("StemText")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<int>("TestId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Type")
                         .IsRequired()
                         .HasMaxLength(20)
                         .IsUnicode(false)
-                        .HasColumnType("varchar(20)");
+                        .HasColumnType("character varying(20)");
 
-                    b.HasKey("QuestionId");
+                    b.HasKey("QuestionId")
+                        .HasName("PK__Question__0DC06FACA15F1129");
 
                     b.HasIndex("StemMediaId");
 
@@ -1128,29 +1167,30 @@ namespace Quiz_Web.Migrations
                 {
                     b.Property<int>("BlankId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BlankId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("BlankId"));
 
                     b.Property<string>("AcceptRegex")
                         .HasMaxLength(400)
-                        .HasColumnType("nvarchar(400)");
+                        .HasColumnType("character varying(400)");
 
                     b.Property<int>("BlankIndex")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<bool>("CaseSensitive")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<string>("CorrectText")
                         .IsRequired()
                         .HasMaxLength(400)
-                        .HasColumnType("nvarchar(400)");
+                        .HasColumnType("character varying(400)");
 
                     b.Property<int>("QuestionId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    b.HasKey("BlankId");
+                    b.HasKey("BlankId")
+                        .HasName("PK__Question__F2BD63E7D863FE86");
 
                     b.HasIndex("QuestionId");
 
@@ -1161,27 +1201,28 @@ namespace Quiz_Web.Migrations
                 {
                     b.Property<int>("OptionId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OptionId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("OptionId"));
 
                     b.Property<bool>("IsCorrect")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<int?>("OptionMediaId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("OptionText")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<int>("OrderIndex")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("QuestionId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    b.HasKey("OptionId");
+                    b.HasKey("OptionId")
+                        .HasName("PK__Question__92C7A1FFD74642E5");
 
                     b.HasIndex("OptionMediaId");
 
@@ -1194,9 +1235,9 @@ namespace Quiz_Web.Migrations
                 {
                     b.Property<int>("RangeId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RangeId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("RangeId"));
 
                     b.Property<decimal>("MaxValue")
                         .HasColumnType("decimal(12, 4)");
@@ -1205,12 +1246,13 @@ namespace Quiz_Web.Migrations
                         .HasColumnType("decimal(12, 4)");
 
                     b.Property<int>("QuestionId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<decimal?>("Tolerance")
                         .HasColumnType("decimal(12, 4)");
 
-                    b.HasKey("RangeId");
+                    b.HasKey("RangeId")
+                        .HasName("PK__Question__6899CA14EF73FB91");
 
                     b.HasIndex("QuestionId");
 
@@ -1221,35 +1263,36 @@ namespace Quiz_Web.Migrations
                 {
                     b.Property<int>("ReminderId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReminderId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ReminderId"));
 
                     b.Property<int>("RelatedId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("RelatedType")
                         .IsRequired()
                         .HasMaxLength(20)
                         .IsUnicode(false)
-                        .HasColumnType("varchar(20)");
+                        .HasColumnType("character varying(20)");
 
                     b.Property<DateTime?>("SentAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasMaxLength(10)
                         .IsUnicode(false)
-                        .HasColumnType("varchar(10)");
+                        .HasColumnType("character varying(10)");
 
                     b.Property<DateTime>("TriggerAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("UserId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    b.HasKey("ReminderId");
+                    b.HasKey("ReminderId")
+                        .HasName("PK__Reminder__01A83087F85448BC");
 
                     b.HasIndex("UserId");
 
@@ -1260,19 +1303,19 @@ namespace Quiz_Web.Migrations
                 {
                     b.Property<int>("RoleId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RoleId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("RoleId"));
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("character varying(50)");
 
                     b.HasKey("RoleId")
-                        .HasName("PK__Roles__8AFACE1AD711602B");
+                        .HasName("PK__Roles__8AFACE1AFBE627BB");
 
-                    b.HasIndex(new[] { "Name" }, "UQ__Roles__737584F69379C895")
+                    b.HasIndex(new[] { "Name" }, "UQ__Roles__737584F6A098F8F5")
                         .IsUnique();
 
                     b.ToTable("Roles");
@@ -1282,35 +1325,36 @@ namespace Quiz_Web.Migrations
                 {
                     b.Property<int>("SavedItemId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SavedItemId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("SavedItemId"));
 
                     b.Property<DateTime>("AddedAt")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("(sysutcdatetime())");
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<int>("ContentId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("ContentType")
                         .IsRequired()
                         .HasMaxLength(20)
                         .IsUnicode(false)
-                        .HasColumnType("varchar(20)");
+                        .HasColumnType("character varying(20)");
 
                     b.Property<int?>("FolderId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("LibraryId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Note")
                         .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasColumnType("character varying(500)");
 
-                    b.HasKey("SavedItemId");
+                    b.HasKey("SavedItemId")
+                        .HasName("PK__SavedIte__1CBC88C8EC7DF7EA");
 
                     b.HasIndex("FolderId");
 
@@ -1319,103 +1363,59 @@ namespace Quiz_Web.Migrations
                     b.ToTable("SavedItems");
                 });
 
-            modelBuilder.Entity("Quiz_Web.Models.Entities.Submission", b =>
+            modelBuilder.Entity("Quiz_Web.Models.Entities.ShoppingCart", b =>
                 {
-                    b.Property<int>("SubmissionId")
+                    b.Property<int>("CartId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SubmissionId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("CartId"));
 
-                    b.Property<int>("AssignmentId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Feedback")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal?>("MaxScore")
-                        .HasColumnType("decimal(6, 2)");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(12)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(12)");
-
-                    b.Property<DateTime>("SubmittedAt")
+                    b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("(sysutcdatetime())");
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
-                    b.Property<decimal?>("TotalScore")
-                        .HasColumnType("decimal(6, 2)");
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("UserId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    b.HasKey("SubmissionId");
+                    b.HasKey("CartId")
+                        .HasName("PK__Shopping__51BCD7B7C43CC63D");
 
-                    b.ToTable("Submissions");
-                });
+                    b.HasIndex(new[] { "UserId" }, "UQ_ShoppingCarts_UserId")
+                        .IsUnique();
 
-            modelBuilder.Entity("Quiz_Web.Models.Entities.SubmissionItem", b =>
-                {
-                    b.Property<int>("SubmissionItemId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SubmissionItemId"));
-
-                    b.Property<string>("Feedback")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal?>("MaxScore")
-                        .HasColumnType("decimal(6, 2)");
-
-                    b.Property<int>("RefId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("RefType")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(20)");
-
-                    b.Property<decimal?>("Score")
-                        .HasColumnType("decimal(6, 2)");
-
-                    b.Property<int>("SubmissionId")
-                        .HasColumnType("int");
-
-                    b.HasKey("SubmissionItemId");
-
-                    b.ToTable("SubmissionItems");
+                    b.ToTable("ShoppingCarts");
                 });
 
             modelBuilder.Entity("Quiz_Web.Models.Entities.Tag", b =>
                 {
                     b.Property<int>("TagId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TagId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("TagId"));
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(80)
-                        .HasColumnType("nvarchar(80)");
+                        .HasColumnType("character varying(80)");
 
                     b.Property<string>("Slug")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("character varying(100)");
 
-                    b.HasKey("TagId");
+                    b.HasKey("TagId")
+                        .HasName("PK__Tags__657CF9ACE6461BCF");
 
-                    b.HasIndex(new[] { "Name" }, "UQ_Tags_Name")
+                    b.HasIndex(new[] { "Name" }, "UQ__Tags__737584F658F22BCC")
                         .IsUnique();
 
-                    b.HasIndex(new[] { "Slug" }, "UQ_Tags_Slug")
+                    b.HasIndex(new[] { "Slug" }, "UQ__Tags__BC7B5FB6571E0B70")
                         .IsUnique();
 
                     b.ToTable("Tags");
@@ -1425,105 +1425,80 @@ namespace Quiz_Web.Migrations
                 {
                     b.Property<int>("TestId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TestId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("TestId"));
+
+                    b.Property<DateTime?>("CloseAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("(sysutcdatetime())");
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("GradingMode")
                         .IsRequired()
                         .HasMaxLength(10)
                         .IsUnicode(false)
-                        .HasColumnType("varchar(10)");
+                        .HasColumnType("character varying(10)");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<int?>("MaxAttempts")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
+
+                    b.Property<decimal?>("MaxScore")
+                        .HasColumnType("decimal(6, 2)");
+
+                    b.Property<DateTime?>("OpenAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("OwnerId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<bool>("ShuffleOptions")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("ShuffleQuestions")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<int?>("TimeLimitSec")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasColumnType("character varying(200)");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Visibility")
                         .IsRequired()
                         .HasMaxLength(20)
                         .IsUnicode(false)
-                        .HasColumnType("varchar(20)");
+                        .HasColumnType("character varying(20)");
 
-                    b.HasKey("TestId");
+                    b.HasKey("TestId")
+                        .HasName("PK__Tests__8CC331602E3C05C8");
 
                     b.HasIndex("OwnerId");
 
                     b.ToTable("Tests");
                 });
 
-            modelBuilder.Entity("Quiz_Web.Models.Entities.TestAssignment", b =>
-                {
-                    b.Property<int>("TestAssignId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TestAssignId"));
-
-                    b.Property<int>("AssignmentId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("AttemptsAllowed")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("DueAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("OverrideTimeLimitSec")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("StartAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("TestId")
-                        .HasColumnType("int");
-
-                    b.HasKey("TestAssignId");
-
-                    b.HasIndex("AssignmentId");
-
-                    b.HasIndex("TestId");
-
-                    b.ToTable("TestAssignments");
-                });
-
             modelBuilder.Entity("Quiz_Web.Models.Entities.TestAttempt", b =>
                 {
                     b.Property<int>("AttemptId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AttemptId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("AttemptId"));
 
                     b.Property<decimal?>("MaxScore")
                         .HasColumnType("decimal(6, 2)");
@@ -1533,28 +1508,29 @@ namespace Quiz_Web.Migrations
 
                     b.Property<DateTime>("StartedAt")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("(sysutcdatetime())");
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasMaxLength(12)
                         .IsUnicode(false)
-                        .HasColumnType("varchar(12)");
+                        .HasColumnType("character varying(12)");
 
                     b.Property<DateTime?>("SubmittedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("TestId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int?>("TimeSpentSec")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("UserId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    b.HasKey("AttemptId");
+                    b.HasKey("AttemptId")
+                        .HasName("PK__TestAtte__891A68E64392AB4D");
 
                     b.HasIndex("TestId");
 
@@ -1567,106 +1543,138 @@ namespace Quiz_Web.Migrations
                 {
                     b.Property<int>("UserId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("UserId"));
 
                     b.Property<string>("AvatarUrl")
                         .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasColumnType("character varying(500)");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("(sysutcdatetime())");
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasColumnType("character varying(255)");
 
                     b.Property<string>("FullName")
                         .IsRequired()
                         .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasColumnType("character varying(200)");
 
                     b.Property<DateTime?>("LastLoginAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasColumnType("character varying(255)");
 
                     b.Property<string>("PasswordResetToken")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
 
                     b.Property<DateTime?>("PasswordResetTokenExpiry")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Phone")
                         .HasMaxLength(20)
                         .IsUnicode(false)
-                        .HasColumnType("varchar(20)");
+                        .HasColumnType("character varying(20)");
 
-                    b.Property<int?>("RoleId")
-                        .HasColumnType("int");
+                    b.Property<int>("RoleId")
+                        .HasColumnType("integer");
 
                     b.Property<int>("Status")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                        .HasColumnType("integer")
                         .HasDefaultValue(1);
 
                     b.Property<string>("Username")
                         .IsRequired()
                         .HasMaxLength(100)
                         .IsUnicode(false)
-                        .HasColumnType("varchar(100)");
+                        .HasColumnType("character varying(100)");
 
                     b.HasKey("UserId")
-                        .HasName("PK__Users__1788CC4CCA2BF316");
+                        .HasName("PK__Users__1788CC4CE98FF591");
 
                     b.HasIndex("RoleId");
 
-                    b.HasIndex(new[] { "Email" }, "UQ__Users__A9D10534076DC7DC")
+                    b.HasIndex(new[] { "Email" }, "UQ__Users__A9D1053455164E7D")
                         .IsUnique();
 
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("Quiz_Web.Models.Entities.UserInterest", b =>
+                {
+                    b.Property<int>("UserInterestId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("UserInterestId"));
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("UserInterestId")
+                        .HasName("PK__UserInte__28E6EBFEF254DB87");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex(new[] { "UserId", "CategoryId" }, "UQ_UserInterests_User_Category")
+                        .IsUnique();
+
+                    b.ToTable("UserInterests");
+                });
+
             modelBuilder.Entity("Quiz_Web.Models.Entities.UserProfile", b =>
                 {
                     b.Property<int>("UserId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Bio")
                         .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasColumnType("character varying(500)");
 
                     b.Property<DateOnly?>("DoB")
                         .HasColumnType("date");
 
                     b.Property<string>("Gender")
                         .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasColumnType("character varying(20)");
 
                     b.Property<string>("GradeLevel")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("character varying(50)");
 
                     b.Property<string>("Locale")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
+                        .HasColumnType("character varying(10)");
 
                     b.Property<string>("SchoolName")
                         .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasColumnType("character varying(200)");
 
                     b.Property<string>("TimeZone")
                         .HasMaxLength(64)
-                        .HasColumnType("nvarchar(64)");
+                        .HasColumnType("character varying(64)");
 
-                    b.HasKey("UserId");
+                    b.HasKey("UserId")
+                        .HasName("PK__UserProf__1788CC4C494B0A05");
 
                     b.ToTable("UserProfiles");
                 });
@@ -1674,32 +1682,33 @@ namespace Quiz_Web.Migrations
             modelBuilder.Entity("Quiz_Web.Models.Entities.UserSetting", b =>
                 {
                     b.Property<int>("UserId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<bool>("EmailOptIn")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
+                        .HasColumnType("boolean")
                         .HasDefaultValue(true);
 
                     b.Property<string>("Language")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
+                        .HasColumnType("character varying(10)");
 
                     b.Property<bool>("PushOptIn")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
+                        .HasColumnType("boolean")
                         .HasDefaultValue(true);
 
                     b.Property<string>("TimeZone")
                         .HasMaxLength(64)
-                        .HasColumnType("nvarchar(64)");
+                        .HasColumnType("character varying(64)");
 
                     b.Property<string>("UiTheme")
                         .HasMaxLength(20)
                         .IsUnicode(false)
-                        .HasColumnType("varchar(20)");
+                        .HasColumnType("character varying(20)");
 
-                    b.HasKey("UserId");
+                    b.HasKey("UserId")
+                        .HasName("PK__UserSett__1788CC4C101AA23F");
 
                     b.ToTable("UserSettings");
                 });
@@ -1740,11 +1749,31 @@ namespace Quiz_Web.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Quiz_Web.Models.Entities.CartItem", b =>
+                {
+                    b.HasOne("Quiz_Web.Models.Entities.ShoppingCart", "Cart")
+                        .WithMany("CartItems")
+                        .HasForeignKey("CartId")
+                        .IsRequired()
+                        .HasConstraintName("FK_CartItems_Cart");
+
+                    b.HasOne("Quiz_Web.Models.Entities.Course", "Course")
+                        .WithMany("CartItems")
+                        .HasForeignKey("CourseId")
+                        .IsRequired()
+                        .HasConstraintName("FK_CartItems_Course");
+
+                    b.Navigation("Cart");
+
+                    b.Navigation("Course");
+                });
+
             modelBuilder.Entity("Quiz_Web.Models.Entities.Certificate", b =>
                 {
                     b.HasOne("Quiz_Web.Models.Entities.Course", "Course")
                         .WithMany("Certificates")
                         .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("FK_Certificates_Course");
 
@@ -1759,64 +1788,15 @@ namespace Quiz_Web.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Quiz_Web.Models.Entities.Class", b =>
+            modelBuilder.Entity("Quiz_Web.Models.Entities.ContentShare", b =>
                 {
-                    b.HasOne("Quiz_Web.Models.Entities.User", "Teacher")
-                        .WithMany("Classes")
-                        .HasForeignKey("TeacherId")
+                    b.HasOne("Quiz_Web.Models.Entities.User", "CreatedByNavigation")
+                        .WithMany("ContentShares")
+                        .HasForeignKey("CreatedBy")
                         .IsRequired()
-                        .HasConstraintName("FK_Classes_Teacher");
+                        .HasConstraintName("FK_ContentShares_Creator");
 
-                    b.Navigation("Teacher");
-                });
-
-            modelBuilder.Entity("Quiz_Web.Models.Entities.ClassAnnouncement", b =>
-                {
-                    b.HasOne("Quiz_Web.Models.Entities.User", "Author")
-                        .WithMany("ClassAnnouncements")
-                        .HasForeignKey("AuthorId")
-                        .IsRequired()
-                        .HasConstraintName("FK_CAnnouncements_Author");
-
-                    b.HasOne("Quiz_Web.Models.Entities.Class", "Class")
-                        .WithMany("ClassAnnouncements")
-                        .HasForeignKey("ClassId")
-                        .IsRequired()
-                        .HasConstraintName("FK_CAnnouncements_Class");
-
-                    b.Navigation("Author");
-
-                    b.Navigation("Class");
-                });
-
-            modelBuilder.Entity("Quiz_Web.Models.Entities.ClassAssignment", b =>
-                {
-                    b.HasOne("Quiz_Web.Models.Entities.Class", "Class")
-                        .WithMany("ClassAssignments")
-                        .HasForeignKey("ClassId")
-                        .IsRequired()
-                        .HasConstraintName("FK_CAssignments_Class");
-
-                    b.Navigation("Class");
-                });
-
-            modelBuilder.Entity("Quiz_Web.Models.Entities.ClassStudent", b =>
-                {
-                    b.HasOne("Quiz_Web.Models.Entities.Class", "Class")
-                        .WithMany("ClassStudents")
-                        .HasForeignKey("ClassId")
-                        .IsRequired()
-                        .HasConstraintName("FK_ClassStudents_Class");
-
-                    b.HasOne("Quiz_Web.Models.Entities.User", "Student")
-                        .WithMany("ClassStudents")
-                        .HasForeignKey("StudentId")
-                        .IsRequired()
-                        .HasConstraintName("FK_ClassStudents_Student");
-
-                    b.Navigation("Class");
-
-                    b.Navigation("Student");
+                    b.Navigation("CreatedByNavigation");
                 });
 
             modelBuilder.Entity("Quiz_Web.Models.Entities.ContentTag", b =>
@@ -1832,31 +1812,52 @@ namespace Quiz_Web.Migrations
 
             modelBuilder.Entity("Quiz_Web.Models.Entities.Course", b =>
                 {
+                    b.HasOne("Quiz_Web.Models.Entities.CourseCategory", "Category")
+                        .WithMany("Courses")
+                        .HasForeignKey("CategoryId")
+                        .HasConstraintName("FK_Courses_Category");
+
                     b.HasOne("Quiz_Web.Models.Entities.User", "Owner")
                         .WithMany("Courses")
                         .HasForeignKey("OwnerId")
                         .IsRequired()
                         .HasConstraintName("FK_Courses_Owner");
 
+                    b.Navigation("Category");
+
                     b.Navigation("Owner");
                 });
 
-            modelBuilder.Entity("Quiz_Web.Models.Entities.CourseContent", b =>
+            modelBuilder.Entity("Quiz_Web.Models.Entities.CourseChapter", b =>
                 {
                     b.HasOne("Quiz_Web.Models.Entities.Course", "Course")
-                        .WithMany("CourseContents")
+                        .WithMany("CourseChapters")
                         .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("FK_CContents_Course");
+                        .HasConstraintName("FK_Chapters_Course");
 
-                    b.HasOne("Quiz_Web.Models.Entities.CourseSection", "Section")
-                        .WithMany("CourseContents")
-                        .HasForeignKey("SectionId")
-                        .HasConstraintName("FK_CContents_Section");
+                    b.Navigation("Course");
+                });
+
+            modelBuilder.Entity("Quiz_Web.Models.Entities.CourseProgress", b =>
+                {
+                    b.HasOne("Quiz_Web.Models.Entities.Course", "Course")
+                        .WithMany("CourseProgresses")
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK__CoursePro__Cours__3493CFA7");
+
+                    b.HasOne("Quiz_Web.Models.Entities.User", "User")
+                        .WithMany("CourseProgresses")
+                        .HasForeignKey("UserId")
+                        .IsRequired()
+                        .HasConstraintName("FK__CoursePro__UserI__339FAB6E");
 
                     b.Navigation("Course");
 
-                    b.Navigation("Section");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Quiz_Web.Models.Entities.CoursePurchase", b =>
@@ -1870,6 +1871,7 @@ namespace Quiz_Web.Migrations
                     b.HasOne("Quiz_Web.Models.Entities.Course", "Course")
                         .WithMany("CoursePurchases")
                         .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("FK_CPurchases_Course");
 
@@ -1878,15 +1880,24 @@ namespace Quiz_Web.Migrations
                     b.Navigation("Course");
                 });
 
-            modelBuilder.Entity("Quiz_Web.Models.Entities.CourseSection", b =>
+            modelBuilder.Entity("Quiz_Web.Models.Entities.CourseReview", b =>
                 {
                     b.HasOne("Quiz_Web.Models.Entities.Course", "Course")
-                        .WithMany("CourseSections")
+                        .WithMany("CourseReviews")
                         .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("FK_CSections_Course");
+                        .HasConstraintName("FK__CourseRev__Cours__1CBC4616");
+
+                    b.HasOne("Quiz_Web.Models.Entities.User", "User")
+                        .WithMany("CourseReviews")
+                        .HasForeignKey("UserId")
+                        .IsRequired()
+                        .HasConstraintName("FK__CourseRev__UserI__1DB06A4F");
 
                     b.Navigation("Course");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Quiz_Web.Models.Entities.File", b =>
@@ -1981,33 +1992,28 @@ namespace Quiz_Web.Migrations
                     b.Navigation("ParentFolder");
                 });
 
-            modelBuilder.Entity("Quiz_Web.Models.Entities.Invitation", b =>
-                {
-                    b.HasOne("Quiz_Web.Models.Entities.Class", "Class")
-                        .WithMany("Invitations")
-                        .HasForeignKey("ClassId")
-                        .HasConstraintName("FK_Invitations_Class");
-
-                    b.HasOne("Quiz_Web.Models.Entities.User", "Inviter")
-                        .WithMany("Invitations")
-                        .HasForeignKey("InviterId")
-                        .IsRequired()
-                        .HasConstraintName("FK_Invitations_Inviter");
-
-                    b.Navigation("Class");
-
-                    b.Navigation("Inviter");
-                });
-
             modelBuilder.Entity("Quiz_Web.Models.Entities.Lesson", b =>
                 {
-                    b.HasOne("Quiz_Web.Models.Entities.User", "Owner")
+                    b.HasOne("Quiz_Web.Models.Entities.CourseChapter", "Chapter")
                         .WithMany("Lessons")
-                        .HasForeignKey("OwnerId")
+                        .HasForeignKey("ChapterId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("FK_Lessons_Chapter");
 
-                    b.Navigation("Owner");
+                    b.Navigation("Chapter");
+                });
+
+            modelBuilder.Entity("Quiz_Web.Models.Entities.LessonContent", b =>
+                {
+                    b.HasOne("Quiz_Web.Models.Entities.Lesson", "Lesson")
+                        .WithMany("LessonContents")
+                        .HasForeignKey("LessonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_LessonContents_Lesson");
+
+                    b.Navigation("Lesson");
                 });
 
             modelBuilder.Entity("Quiz_Web.Models.Entities.Library", b =>
@@ -2032,26 +2038,47 @@ namespace Quiz_Web.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Quiz_Web.Models.Entities.NotificationChannel", b =>
+            modelBuilder.Entity("Quiz_Web.Models.Entities.Order", b =>
                 {
-                    b.HasOne("Quiz_Web.Models.Entities.User", "User")
-                        .WithMany("NotificationChannels")
-                        .HasForeignKey("UserId")
+                    b.HasOne("Quiz_Web.Models.Entities.User", "Buyer")
+                        .WithMany("Orders")
+                        .HasForeignKey("BuyerId")
                         .IsRequired()
-                        .HasConstraintName("FK_NChannels_User");
+                        .HasConstraintName("FK_Orders_User");
 
-                    b.Navigation("User");
+                    b.Navigation("Buyer");
+                });
+
+            modelBuilder.Entity("Quiz_Web.Models.Entities.OrderItem", b =>
+                {
+                    b.HasOne("Quiz_Web.Models.Entities.Course", "Course")
+                        .WithMany("OrderItems")
+                        .HasForeignKey("CourseId")
+                        .IsRequired()
+                        .HasConstraintName("FK_OrderItems_Course");
+
+                    b.HasOne("Quiz_Web.Models.Entities.Order", "Order")
+                        .WithMany("OrderItems")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_OrderItems_Order");
+
+                    b.Navigation("Course");
+
+                    b.Navigation("Order");
                 });
 
             modelBuilder.Entity("Quiz_Web.Models.Entities.Payment", b =>
                 {
-                    b.HasOne("Quiz_Web.Models.Entities.CoursePurchase", "Purchase")
+                    b.HasOne("Quiz_Web.Models.Entities.Order", "Order")
                         .WithMany("Payments")
-                        .HasForeignKey("PurchaseId")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("FK_Payments_Purchase");
+                        .HasConstraintName("FK_Payments_Order");
 
-                    b.Navigation("Purchase");
+                    b.Navigation("Order");
                 });
 
             modelBuilder.Entity("Quiz_Web.Models.Entities.Question", b =>
@@ -2141,6 +2168,17 @@ namespace Quiz_Web.Migrations
                     b.Navigation("Library");
                 });
 
+            modelBuilder.Entity("Quiz_Web.Models.Entities.ShoppingCart", b =>
+                {
+                    b.HasOne("Quiz_Web.Models.Entities.User", "User")
+                        .WithOne("ShoppingCart")
+                        .HasForeignKey("Quiz_Web.Models.Entities.ShoppingCart", "UserId")
+                        .IsRequired()
+                        .HasConstraintName("FK_ShoppingCarts_User");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Quiz_Web.Models.Entities.Test", b =>
                 {
                     b.HasOne("Quiz_Web.Models.Entities.User", "Owner")
@@ -2150,25 +2188,6 @@ namespace Quiz_Web.Migrations
                         .HasConstraintName("FK_Tests_Owner");
 
                     b.Navigation("Owner");
-                });
-
-            modelBuilder.Entity("Quiz_Web.Models.Entities.TestAssignment", b =>
-                {
-                    b.HasOne("Quiz_Web.Models.Entities.ClassAssignment", "Assignment")
-                        .WithMany("TestAssignments")
-                        .HasForeignKey("AssignmentId")
-                        .IsRequired()
-                        .HasConstraintName("FK_TAssign_Assignment");
-
-                    b.HasOne("Quiz_Web.Models.Entities.Test", "Test")
-                        .WithMany("TestAssignments")
-                        .HasForeignKey("TestId")
-                        .IsRequired()
-                        .HasConstraintName("FK_TAssign_Test");
-
-                    b.Navigation("Assignment");
-
-                    b.Navigation("Test");
                 });
 
             modelBuilder.Entity("Quiz_Web.Models.Entities.TestAttempt", b =>
@@ -2195,9 +2214,29 @@ namespace Quiz_Web.Migrations
                     b.HasOne("Quiz_Web.Models.Entities.Role", "Role")
                         .WithMany("Users")
                         .HasForeignKey("RoleId")
-                        .HasConstraintName("FK__Users__RoleId__3D5E1FD2");
+                        .IsRequired()
+                        .HasConstraintName("FK_Users_Roles");
 
                     b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("Quiz_Web.Models.Entities.UserInterest", b =>
+                {
+                    b.HasOne("Quiz_Web.Models.Entities.CourseCategory", "Category")
+                        .WithMany("UserInterests")
+                        .HasForeignKey("CategoryId")
+                        .IsRequired()
+                        .HasConstraintName("FK_UserInterests_Category");
+
+                    b.HasOne("Quiz_Web.Models.Entities.User", "User")
+                        .WithMany("UserInterests")
+                        .HasForeignKey("UserId")
+                        .IsRequired()
+                        .HasConstraintName("FK_UserInterests_User");
+
+                    b.Navigation("Category");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Quiz_Web.Models.Entities.UserProfile", b =>
@@ -2222,41 +2261,33 @@ namespace Quiz_Web.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Quiz_Web.Models.Entities.Class", b =>
-                {
-                    b.Navigation("ClassAnnouncements");
-
-                    b.Navigation("ClassAssignments");
-
-                    b.Navigation("ClassStudents");
-
-                    b.Navigation("Invitations");
-                });
-
-            modelBuilder.Entity("Quiz_Web.Models.Entities.ClassAssignment", b =>
-                {
-                    b.Navigation("TestAssignments");
-                });
-
             modelBuilder.Entity("Quiz_Web.Models.Entities.Course", b =>
                 {
+                    b.Navigation("CartItems");
+
                     b.Navigation("Certificates");
 
-                    b.Navigation("CourseContents");
+                    b.Navigation("CourseChapters");
+
+                    b.Navigation("CourseProgresses");
 
                     b.Navigation("CoursePurchases");
 
-                    b.Navigation("CourseSections");
+                    b.Navigation("CourseReviews");
+
+                    b.Navigation("OrderItems");
                 });
 
-            modelBuilder.Entity("Quiz_Web.Models.Entities.CoursePurchase", b =>
+            modelBuilder.Entity("Quiz_Web.Models.Entities.CourseCategory", b =>
                 {
-                    b.Navigation("Payments");
+                    b.Navigation("Courses");
+
+                    b.Navigation("UserInterests");
                 });
 
-            modelBuilder.Entity("Quiz_Web.Models.Entities.CourseSection", b =>
+            modelBuilder.Entity("Quiz_Web.Models.Entities.CourseChapter", b =>
                 {
-                    b.Navigation("CourseContents");
+                    b.Navigation("Lessons");
                 });
 
             modelBuilder.Entity("Quiz_Web.Models.Entities.File", b =>
@@ -2289,11 +2320,23 @@ namespace Quiz_Web.Migrations
                     b.Navigation("SavedItems");
                 });
 
+            modelBuilder.Entity("Quiz_Web.Models.Entities.Lesson", b =>
+                {
+                    b.Navigation("LessonContents");
+                });
+
             modelBuilder.Entity("Quiz_Web.Models.Entities.Library", b =>
                 {
                     b.Navigation("Folders");
 
                     b.Navigation("SavedItems");
+                });
+
+            modelBuilder.Entity("Quiz_Web.Models.Entities.Order", b =>
+                {
+                    b.Navigation("OrderItems");
+
+                    b.Navigation("Payments");
                 });
 
             modelBuilder.Entity("Quiz_Web.Models.Entities.Question", b =>
@@ -2312,6 +2355,11 @@ namespace Quiz_Web.Migrations
                     b.Navigation("Users");
                 });
 
+            modelBuilder.Entity("Quiz_Web.Models.Entities.ShoppingCart", b =>
+                {
+                    b.Navigation("CartItems");
+                });
+
             modelBuilder.Entity("Quiz_Web.Models.Entities.Tag", b =>
                 {
                     b.Navigation("ContentTags");
@@ -2320,8 +2368,6 @@ namespace Quiz_Web.Migrations
             modelBuilder.Entity("Quiz_Web.Models.Entities.Test", b =>
                 {
                     b.Navigation("Questions");
-
-                    b.Navigation("TestAssignments");
 
                     b.Navigation("TestAttempts");
                 });
@@ -2339,13 +2385,13 @@ namespace Quiz_Web.Migrations
 
                     b.Navigation("Certificates");
 
-                    b.Navigation("ClassAnnouncements");
+                    b.Navigation("ContentShares");
 
-                    b.Navigation("ClassStudents");
-
-                    b.Navigation("Classes");
+                    b.Navigation("CourseProgresses");
 
                     b.Navigation("CoursePurchases");
+
+                    b.Navigation("CourseReviews");
 
                     b.Navigation("Courses");
 
@@ -2355,21 +2401,21 @@ namespace Quiz_Web.Migrations
 
                     b.Navigation("FlashcardSets");
 
-                    b.Navigation("Invitations");
-
-                    b.Navigation("Lessons");
-
                     b.Navigation("Libraries");
-
-                    b.Navigation("NotificationChannels");
 
                     b.Navigation("Notifications");
 
+                    b.Navigation("Orders");
+
                     b.Navigation("Reminders");
+
+                    b.Navigation("ShoppingCart");
 
                     b.Navigation("TestAttempts");
 
                     b.Navigation("Tests");
+
+                    b.Navigation("UserInterests");
 
                     b.Navigation("UserProfile");
 

@@ -127,11 +127,14 @@ namespace Quiz_Web.Services
                 purchase.Status = "Paid";
 
                 // Cập nhật tất cả purchase cùng user và cùng thời điểm (trong vòng 1 phút)
-                var relatedPurchases = await _context.CoursePurchases
+                var relatedPurchasesList = await _context.CoursePurchases
                     .Where(p => p.BuyerId == purchase.BuyerId &&
-                               p.Status == "Pending" &&
-                               Math.Abs(EF.Functions.DateDiffSecond(p.PurchasedAt, purchase.PurchasedAt)) <= 60)
+                               p.Status == "Pending")
                     .ToListAsync();
+
+                var relatedPurchases = relatedPurchasesList
+                    .Where(p => Math.Abs((p.PurchasedAt - purchase.PurchasedAt).TotalSeconds) <= 60)
+                    .ToList();
 
                 foreach (var relatedPurchase in relatedPurchases)
                 {
