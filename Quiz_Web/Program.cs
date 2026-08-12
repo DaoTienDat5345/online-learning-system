@@ -7,6 +7,7 @@ using Ganss.Xss;
 using Quiz_Web.Models.MoMoPayment;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.WebHost.UseSentry();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -117,4 +118,5 @@ app.MapControllerRoute(
     .WithStaticAssets();
 
 app.Run();
+
 

@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -47,6 +47,12 @@ namespace Quiz_Web.Controllers
                 // Redirect đến trang Introduce cho người dùng mới
                 return RedirectToAction("Index", "Introduce");
             }
+        }
+
+        [HttpGet("test-sentry")]
+        public IActionResult TestSentry()
+        {
+            throw new Exception("Thử nghiệm lỗi Sentry từ dự án Quiz_Web!");
         }
 
         public async Task<IActionResult> Index()
