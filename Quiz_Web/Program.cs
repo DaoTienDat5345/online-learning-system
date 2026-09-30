@@ -1,10 +1,11 @@
-using Microsoft.AspNetCore.Authentication.Cookies;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using Quiz_Web.Models.EF;
 using Quiz_Web.Services;
 using Quiz_Web.Services.IServices;
 using Ganss.Xss;
 using Quiz_Web.Models.MoMoPayment;
+using Quiz_Web.Models.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.UseSentry();
@@ -44,6 +45,10 @@ builder.Services.AddDbContext<LearningPlatformContext>(options =>
 
 // Configure MoMo settings
 builder.Services.Configure<MoMoSettings>(builder.Configuration.GetSection("MoMoSettings"));
+
+// Configure Cloudflare R2 settings
+builder.Services.Configure<CloudflareR2Settings>(builder.Configuration.GetSection("CloudflareR2"));
+builder.Services.AddScoped<IStorageService, CloudflareR2StorageService>();
 
 // Register HttpClient for MoMoPaymentService
 builder.Services.AddHttpClient<IMoMoPaymentService, MoMoPaymentService>();
@@ -111,12 +116,14 @@ app.MapControllerRoute(
     pattern: "Checkout/{action=Index}/{id?}",
     defaults: new { controller = "Checkout" });
 
-// Route m?c ??nh tr? ??n Welcome action ?? x? l� logic
+// Route m?c ??nh tr? ??n Welcome action ?? x? lý logic
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Welcome}/{id?}")
     .WithStaticAssets();
 
 app.Run();
+
+
 
 
